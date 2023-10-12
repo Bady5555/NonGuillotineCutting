@@ -10,9 +10,13 @@ public class HillClimbing
     }
     public Solution Solve(int iterations)
     {
+        var plt = new ScottPlot.Plot(600, 600);
+        double[] xs = new double[iterations];
+        double[] ys = new double[iterations];
+
         Solution startSolution = GenerateInitialSolution();
         Solution bestSolution = startSolution;
-        //int startScore = startSolution.Score;
+
         Console.WriteLine($"Score: {startSolution.Score}");
         for (int i = 0; i < iterations; i++)
         {
@@ -23,10 +27,17 @@ public class HillClimbing
             {
                 bestSolution = neighbor;
                 Console.WriteLine($"Best score: {bestSolution.Score}");
+                ys[i] = bestSolution.Score;
             }
+
+            xs[i] = i; 
         }
         float perc = 100 * (float)bestSolution.Score / (float)startSolution.Score;
         Console.WriteLine($"Percent remainder: {String.Format("{0:N2}", perc)}");
+        
+        plt.AddScatter(xs, ys);
+        plt.SaveFig("Solution.png");
+        
         return bestSolution;
     }
 
@@ -37,8 +48,8 @@ public class HillClimbing
         {
             int width = Job.Rects[i].W; 
             int height = Job.Rects[i].H;
-            int x = 0;// random.Next(0, maxWidth - width); 
-            int y = 0;//random.Next(0, maxHeight - height);
+            int x = 0;
+            int y = 0;
 
             Rectangle rectangle = new Rectangle(width, height);
             rectangle.X = x;
@@ -56,36 +67,6 @@ public class HillClimbing
     private Solution GenerateNeighborSolution(Solution currentSolution)
     {
         Solution neighborSolution = new Solution();
-        //int i = 0;
-
-        //while (neighborSolution.ReservRectangles.Count > 0 && i < neighborSolution.ReservRectangles.Count)
-        //{
-        //    var newRect = neighborSolution.ReservRectangles[i];
-        //    //Rectangle newRect = new Rectangle(rect.Width, rect.Height);
-
-        //    int xOffset = random.Next(-Job.Bin.W - newRect.Width, Job.Bin.W - newRect.Width);
-        //    int yOffset = random.Next(-Job.Bin.H - newRect.Height, Job.Bin.H - newRect.Height);
-
-        //    //Console.WriteLine($"XOffset:{xOffset}  YOffset:{yOffset}");
-
-        //    newRect.X = Math.Max(0, Math.Min(newRect.X + xOffset, Job.Bin.W - newRect.Width));
-        //    newRect.Y = Math.Max(0, Math.Min(newRect.Y + yOffset, Job.Bin.H - newRect.Height));
-
-        //    if (i == 0) Console.WriteLine($"Item 0: W:{newRect.Width} H:{newRect.Height} X:{newRect.X} Y:{newRect.Y}");
-
-        //    // Check for intersection with existing rectangles
-        //    bool intersects = neighborSolution.Rectangles.Any(existingRect =>
-        //        !(newRect.X + newRect.Width <= existingRect.X || existingRect.X + existingRect.Width <= newRect.X ||
-        //          newRect.Y + newRect.Height <= existingRect.Y || existingRect.Y + existingRect.Height <= newRect.Y));
-
-        //    if (!intersects)
-        //    {
-        //        neighborSolution.Rectangles.Add(newRect);
-        //        neighborSolution.ReservRectangles.Remove(newRect);
-        //        continue;
-        //    }
-        //    i++;
-        //}
 
         int currentRowHeight = 0;
         int currentY = 0;
