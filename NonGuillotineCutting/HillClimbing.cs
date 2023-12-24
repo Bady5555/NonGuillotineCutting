@@ -2,7 +2,10 @@
 
 public class HillClimbing
 {
-    public Job Job { get; set; }
+
+    private List<List<Rectangle>> ExplicitMemory = new List<List<Rectangle>>();
+
+	public Job Job { get; set; }
 
     public HillClimbing(Job job) 
     {
@@ -21,6 +24,21 @@ public class HillClimbing
         for (int i = 0; i < iterations; i++)
         {
             bestSolution.MixSourceRect();
+            if (ExplicitMemory.Count == 0)
+            {
+                ExplicitMemory.Add(bestSolution.ReservRectangles);
+            }
+            else
+            {
+                if (SolutionAlreadyExist(bestSolution.ReservRectangles))
+                {
+                    continue;
+                }
+                else
+                {
+					ExplicitMemory.Add(bestSolution.ReservRectangles);
+				}
+            }
             Solution neighbor = GenerateNeighborSolution(bestSolution);
             //Console.WriteLine($"Score: {neighbor.Score}");
             if (neighbor.Score > bestSolution.Score)
@@ -41,7 +59,28 @@ public class HillClimbing
         return bestSolution;
     }
 
-    private Solution GenerateInitialSolution()
+	private bool SolutionAlreadyExist(List<Rectangle> reservRectangles)
+	{
+        bool areEquals = true;
+		foreach (List<Rectangle> solution in ExplicitMemory)
+        {
+            for (int i = 0; i < solution.Count; i++)
+            {
+                if (solution[i].Width != reservRectangles[i].Width || solution[i].Height != reservRectangles[i].Height)
+                {
+					areEquals = false;
+                    break;
+                }
+            }
+            if (areEquals)
+            { 
+                break; 
+            }
+        }
+        return areEquals;
+	}
+
+	private Solution GenerateInitialSolution()
     {
         Solution initialSolution = new Solution();
         for (int i = 0; i < Job.Rects.Length; i++) 
