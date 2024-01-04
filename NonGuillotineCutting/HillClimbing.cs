@@ -3,7 +3,7 @@
 public class HillClimbing
 {
 
-    private List<List<Rectangle>> ExplicitMemory = new List<List<Rectangle>>();
+    internal List<List<Rectangle>> AntExplorers = new List<List<Rectangle>>();
 
 	public Job Job { get; set; }
 
@@ -11,44 +11,30 @@ public class HillClimbing
     {
         Job = job; 
     }
-    public Solution Solve(int iterations)
+    public Solution Solve(int antExplorersLimit)
     {
         var plt = new ScottPlot.Plot(600, 600);
-        double[] xs = new double[iterations];
-        double[] ys = new double[iterations];
+        double[] xs = new double[antExplorersLimit];
+        double[] ys = new double[antExplorersLimit];
 
         Solution startSolution = GenerateInitialSolution();
         Solution bestSolution = startSolution;
 
         Console.WriteLine($"Score: {startSolution.Score}");
-        for (int i = 0; i < iterations; i++)
+        while (AntExplorers.Count <= antExplorersLimit)
         {
             bestSolution.MixSourceRect();
-            if (ExplicitMemory.Count == 0)
-            {
-                ExplicitMemory.Add(bestSolution.ReservRectangles);
-            }
-            else
-            {
-                if (SolutionAlreadyExist(bestSolution.ReservRectangles))
-                {
-                    continue;
-                }
-                else
-                {
-					ExplicitMemory.Add(bestSolution.ReservRectangles);
-				}
-            }
             Solution neighbor = GenerateNeighborSolution(bestSolution);
             //Console.WriteLine($"Score: {neighbor.Score}");
             if (neighbor.Score > bestSolution.Score)
             {
                 bestSolution = neighbor;
-                Console.WriteLine($"Best score: {bestSolution.Score}");
-                ys[i] = bestSolution.Score;
+                Console.WriteLine($"AntExplorers Best score: {bestSolution.Score}");
+                //ys[i] = bestSolution.Score;
+                AntExplorers.Add(bestSolution.Rectangles);
             }
 
-            xs[i] = i; 
+            //xs[i] = i; 
         }
         float perc = 100 * (float)bestSolution.Score / (float)startSolution.Score;
         Console.WriteLine($"Percent remainder: {String.Format("{0:N2}", perc)}");
@@ -58,27 +44,6 @@ public class HillClimbing
         
         return bestSolution;
     }
-
-	private bool SolutionAlreadyExist(List<Rectangle> reservRectangles)
-	{
-        bool areEquals = true;
-		foreach (List<Rectangle> solution in ExplicitMemory)
-        {
-            for (int i = 0; i < solution.Count; i++)
-            {
-                if (solution[i].Width != reservRectangles[i].Width || solution[i].Height != reservRectangles[i].Height)
-                {
-					areEquals = false;
-                    break;
-                }
-            }
-            if (areEquals)
-            { 
-                break; 
-            }
-        }
-        return areEquals;
-	}
 
 	private Solution GenerateInitialSolution()
     {
@@ -103,7 +68,7 @@ public class HillClimbing
     }
 
 
-    private Solution GenerateNeighborSolution(Solution currentSolution)
+    public Solution GenerateNeighborSolution(Solution currentSolution)
     {
         Solution neighborSolution = new Solution();
 
